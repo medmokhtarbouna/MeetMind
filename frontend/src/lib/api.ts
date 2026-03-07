@@ -1,6 +1,24 @@
 import { supabase } from './supabase';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// API Base URL - Set VITE_API_URL in your .env file for production
+// Example: VITE_API_URL=https://meetmind-backend-production-11c2.up.railway.app/api
+function getApiBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL;
+  
+  if (envUrl) {
+    // Ensure the URL has a protocol
+    if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+      return envUrl;
+    }
+    // If no protocol, assume https for production URLs
+    return `https://${envUrl}`;
+  }
+  
+  // Default to localhost for development
+  return 'http://localhost:3001/api';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface ApiResponse<T> {
   data: T | null;
@@ -20,10 +38,25 @@ export async function apiRequest<T>(
     const token = await getAccessToken();
     
     if (!token) {
+      if (import.meta.env.DEV) {
+        console.error('[API] No token available');
+      }
       return { data: null, error: 'Not authenticated' };
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
+    
+    // Debug logging in development only
+    if (import.meta.env.DEV) {
+      console.log('[API] Request:', {
+        url: fullUrl,
+        method: options.method || 'GET',
+        hasToken: !!token,
+        tokenLength: token?.length || 0
+      });
+    }
+
+    const response = await fetch(fullUrl, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +65,49 @@ export async function apiRequest<T>(
       },
     });
 
-    const result = await response.json();
+    // Debug logging in development only
+    if (import.meta.env.DEV) {
+      console.log('[API] Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type'),
+        url: fullUrl
+      });
+    }
+
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType && contentType.includes('application/json');
+
+    let result;
+    
+    if (!isJson) {
+      // If not JSON, it might be HTML (error page) or empty
+      const text = await response.text();
+      
+      // Check for CORS errors or HTML responses
+      if (text.includes('<!doctype') || text.includes('<html')) {
+        return {
+          data: null,
+          error: `Server returned HTML instead of JSON. This might be a CORS issue or the API endpoint is incorrect. URL: ${API_BASE_URL}${endpoint}`
+        };
+      }
+
+      return {
+        data: null,
+        error: `Expected JSON response but got ${contentType || 'unknown content type'}. Status: ${response.status}`
+      };
+    }
+
+    // Parse JSON response
+    try {
+      result = await response.json();
+    } catch (parseError) {
+      return {
+        data: null,
+        error: `Failed to parse JSON response: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`
+      };
+    }
 
     if (!response.ok) {
       return { 
@@ -44,6 +119,22 @@ export async function apiRequest<T>(
     return { data: result.data || result, error: null };
 
   } catch (error) {
+    // Handle JSON parse errors specifically
+    if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      return {
+        data: null,
+        error: `Failed to parse JSON response. This might indicate a CORS issue or the API is returning HTML. Check the API URL: ${API_BASE_URL}`
+      };
+    }
+
+    // Handle network errors
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return {
+        data: null,
+        error: `Network error: Unable to reach the API at ${API_BASE_URL}. Please check your connection and API URL.`
+      };
+    }
+
     return { 
       data: null, 
       error: error instanceof Error ? error.message : 'Unknown error' 

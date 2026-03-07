@@ -21,9 +21,20 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  // CORS configuration - allow all origins in production, or specific origins from env
+  const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+  let corsOrigin: boolean | string[] = true; // Allow all by default for production
+
+  if (allowedOriginsEnv) {
+    corsOrigin = allowedOriginsEnv.split(',').map(origin => origin.trim());
+  } else if (process.env.NODE_ENV !== 'production') {
+    // In development, restrict to localhost
+    corsOrigin = ['http://localhost:5173', 'http://localhost:3000'];
+  }
+
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    origin: corsOrigin,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
