@@ -130,18 +130,41 @@ export function NewMeetingPage() {
             </div>
             
             <div 
-              className="border-2 border-dashed border-[var(--color-border)] rounded-2xl bg-[var(--bg-subtle)] p-8 text-center hover:border-[#26b1b3]/50 transition-colors"
+              className="border-2 border-dashed border-[var(--color-border)] rounded-2xl bg-[var(--bg-subtle)] p-8 text-center hover:border-[#26b1b3]/50 transition-colors cursor-pointer"
               onDrop={(e) => {
                 e.preventDefault()
+                e.stopPropagation()
                 const file = e.dataTransfer.files[0]
                 if (file) {
-                  setSelectedFile(file)
-                  setFileName(file.name)
-                  setError('')
+                  // Validate file type
+                  const validTypes = ['video/', 'audio/', '.mp4', '.webm', '.mp3', '.wav', '.m4a', '.ogg']
+                  const isValidType = validTypes.some(type => 
+                    file.type.includes(type) || file.name.toLowerCase().endsWith(type)
+                  )
+                  
+                  if (isValidType) {
+                    setSelectedFile(file)
+                    setFileName(file.name)
+                    setError('')
+                  } else {
+                    setError('Invalid file type. Please upload MP4, WebM, MP3, WAV, M4A, or OGG files.')
+                  }
                 }
               }}
               onDragOver={(e) => {
                 e.preventDefault()
+                e.stopPropagation()
+              }}
+              onDragEnter={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+              onClick={() => {
+                document.getElementById('file-upload')?.click()
               }}
             >
               <div className="flex flex-col items-center justify-center space-y-4">
@@ -173,9 +196,21 @@ export function NewMeetingPage() {
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) {
-                      setSelectedFile(file)
-                      setFileName(file.name)
-                      setError('')
+                      // Validate file type
+                      const validTypes = ['video/', 'audio/', '.mp4', '.webm', '.mp3', '.wav', '.m4a', '.ogg']
+                      const isValidType = validTypes.some(type => 
+                        file.type.includes(type) || file.name.toLowerCase().endsWith(type)
+                      )
+                      
+                      if (isValidType) {
+                        setSelectedFile(file)
+                        setFileName(file.name)
+                        setError('')
+                      } else {
+                        setError('Invalid file type. Please upload MP4, WebM, MP3, WAV, M4A, or OGG files.')
+                        // Reset file input
+                        e.target.value = ''
+                      }
                     }
                   }}
                 />
