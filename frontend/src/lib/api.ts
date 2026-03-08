@@ -1,7 +1,6 @@
 import { supabase } from './supabase';
 
-// API Base URL - Set VITE_API_URL in your .env file for production
-// Example: VITE_API_URL=https://meetmind-backend-production-11c2.up.railway.app/api
+
 function getApiBaseUrl(): string {
   const envUrl = import.meta.env.VITE_API_URL;
   

@@ -29,7 +29,7 @@ async function bootstrap() {
     corsOrigin = allowedOriginsEnv.split(',').map(origin => origin.trim());
   } else if (process.env.NODE_ENV !== 'production') {
     // In development, restrict to localhost
-    corsOrigin = ['http://localhost:5173', 'http://localhost:3000'];
+    corsOrigin = ['http://localhost:5173', 'https://meet-mind.netlify.app'];
   }
 
   app.enableCors({

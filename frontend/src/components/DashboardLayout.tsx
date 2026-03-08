@@ -230,7 +230,15 @@ export function DashboardLayout({ title, children }: DashboardLayoutProps) {
   )
 }
 
-const NOTIFICATIONS = [] as const
+interface Notification {
+  id: string
+  type: 'success' | 'warning' | 'info'
+  title: string
+  message: string
+  time: string
+}
+
+const NOTIFICATIONS: Notification[] = []
 
 interface SidebarItemProps {
   to: string

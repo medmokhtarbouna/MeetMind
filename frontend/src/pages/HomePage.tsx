@@ -228,8 +228,10 @@ export function HomePage() {
           </div>
         </section>
 
+            <div className='mx-auto max-w-[1200px] px-4 pb-14'>
+
         <section
-          className="hidden md:block relative 2xl:px-60 lg:px-28 md:px-10 px-4 pt-[95px] pb-[115px]"
+          className="hidden md:block relative 2xl:px-28 lg:px-20 md:px-10 px-4 pt-[95px] pb-[115px]"
           style={{
             backgroundImage: "url('/img/section.png')",
             backgroundSize: 'contain',
@@ -247,6 +249,7 @@ export function HomePage() {
             </p>
           </div>
         </section>
+        </div>
 
         <section className="mx-auto max-w-[1200px] px-4 pb-16">
           <div className="mb-8 flex flex-col gap-2">
