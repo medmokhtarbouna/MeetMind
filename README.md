@@ -165,24 +165,19 @@ project-root/
 │   ├── package.json
 │   └── .env
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── contexts/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── types/
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   │
-│   ├── package.json
-│   └── .env
-│
-└── supabase/
-    ├── migrations/
-    ├── functions/
-    └── seed.sql
+└──  frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── contexts/
+    │   ├── lib/
+    │   ├── pages/
+    │   ├── services/
+    │   ├── types/
+    │   ├── App.tsx
+    │   └── main.tsx
+    │
+    ├── package.json
+    └── .env
 ```
 
 ---

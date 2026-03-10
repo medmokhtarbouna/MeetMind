@@ -171,7 +171,7 @@ export function SignupPage() {
             <InputField
               label="Full name"
               name="fullName"
-              placeholder="Alex Rivera"
+              placeholder="Enter your full name"
               autoComplete="name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -181,7 +181,7 @@ export function SignupPage() {
               label="Work email"
               name="email"
               type="email"
-              placeholder="alex@company.com"
+              placeholder="your.email@company.com"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
